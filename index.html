@@ -9,6 +9,10 @@
 	<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 	<style>
 
+		* {
+			 box-sizing: border-box;
+		}
+
 		body {
 			font-size: 64px;
 			font-family: "Montserrat", sans-serif;
@@ -22,6 +26,61 @@
    			text-align: center;
    			cursor: pointer;
 		}
+
+		.pop-up {
+			position: fixed;
+			top: 0;
+			left: 50%;
+			z-index: 9;
+			width: 100%;
+			max-width: 800px;
+			transform: translate(-50%, -110%);
+			transition: .2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+
+		}
+
+		.pop-up.show {
+			top: 10%;
+			transform: translate(-50%, 0%);
+		}
+
+		#textfield {
+			display: block;
+			width: 100%;
+			height: 400px;
+			padding: 20px;
+			border: 2px solid black;
+			border-radius: 4px; 
+			font-size: 32px;
+			resize: none;
+		}
+
+		#textfield:focus-visible {
+			outline: none;
+		}
+
+		#send-text {
+			position: absolute;
+			bottom: 20px;
+			right: 20px;
+			z-index: 3;
+			padding: 1px 14px;
+		    border-radius: 4px;
+	        border: 2px solid black;
+
+		    background: #fff;
+		    font-size: 22px;
+		    color: #000;
+		    font-weight: 600;
+		    cursor: pointer;
+		    user-select: none;
+		    transition: all .1s linear;
+		}
+
+		#send-text:hover {
+			box-shadow: 3px 2px #000;
+		}
+		
 
 		.list-block {
 			text-align: center;
@@ -79,6 +138,10 @@
 </head>
 <body class="no-scroll">
 	<div id="add">+</div>
+	<div class="pop-up">
+		<textarea id="textfield"></textarea>
+		<div id="send-text">add</div>
+	</div>
 	<div id="slider">
 		<div id="word"></div>
 		<div class="arrows">
@@ -97,39 +160,6 @@
 	
 	<script type="text/javascript">
 		
-		// const words = [
-		// 	'enigma',
-		// 	'vigorous',
-		// 	'exquisite',
-		// 	'expose',
-		// 	'frugal',
-		// 	'erstwhile',
-		// 	'successor',
-		// 	'extant',
-		// 	'utilize',
-		// 	'nonetheless',
-		// 	'comprehend',
-		// 	'albeit',
-		// 	'grudgingly',
-		// 	'grisly',
-		// 	'poverty',
-		// 	'eking out',
-		// 	'scrimp',
-		// 	'hefty',
-		// 	'fees',
-		// 	'abject',
-		// 	'contribution',
-		// 	'pursuit',
-		// 	'destitution',
-		// 	'accomplish',
-		// 	'staunchly',
-		// 	'hag',
-		// 	'lineage',
-		// 	'stubborn',
-		// 	'dimwit',
-		// 	'stroking',
-		// 	'exceptional',
-		// ]
 		const words = [
 			'facilitate',
 			'residual',
@@ -176,6 +206,9 @@
 		const wordsButton = document.querySelector('.show-list-btn');
 		const countStart = document.querySelector('.counter .start');
 		const countEnd = document.querySelector('.counter .end');
+		const add_btn = document.getElementById('add');
+		const popup = document.querySelector('.pop-up');
+		const send_text_btn = document.getElementById('send-text');
 		let index = 0;
 		countStart.textContent = 1;
 		countEnd.textContent = words.length;
@@ -216,21 +249,27 @@
 			
 		}
 
-		const addBtn = document.getElementById('add');
-		addBtn.onclick = () => {
-			let input = prompt("Paste words:");
-			if (input) {
-	        	let words = input.split(/[\s,]+/).map(word => word.trim()).filter(word => word !== "");
-	        	shuffledWords = shuffle(words);
-	        	list.innerHTML = null;
-	        	showWordsArray(shuffledWords);
-	        	countEnd.textContent = words.length;
-	        	index = 0;
-	        	wordBlock.textContent = shuffledWords[index]
-	    	} else {
-	        	return []; 
-    		}
+		add_btn.onclick = () => {
+			popup.classList.add('show');
 		}
+
+
+		const addNewWords = () => {
+			const words = document.getElementById('textfield').value.split('\n').map(line => {
+        // Убираем лишние пробелы и символы
+        return line.split(/[\s-]/)[0].trim(); // Берем только первое слово до пробела или тире
+    }).filter(word => word.length > 0);
+			document.getElementById('textfield').value = null;
+			popup.classList.remove('show');
+			shuffledWords = shuffle(words);
+        	list.innerHTML = null;
+        	showWordsArray(shuffledWords);
+        	countEnd.textContent = words.length;
+        	index = 0;
+        	wordBlock.textContent = shuffledWords[index]
+		}
+
+		send_text_btn.onclick = addNewWords;
 	</script>
 </body>
 </html>
